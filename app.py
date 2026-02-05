@@ -2,29 +2,32 @@ import streamlit as st
 import pickle
 import pandas as pd
 import requests
+import time
 
-API_KEY = st.secrets["TMDB_API_KEY"]
+API_KEY = "bdb1b6f6f524ecda7caf5034e7f9f665"
 
 
 @st.cache_data(show_spinner=False)
 def fetch_poster(movie_id):
     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={API_KEY}&language=en-US"
-
     try:
+        time.sleep(0.4)  # reduce TMDB blocking
         response = requests.get(url, timeout=5)
-        response.raise_for_status()
-        data = response.json()
 
-        poster_path = data.get("poster_path")
-        if poster_path:
-            return "https://image.tmdb.org/t/p/w500" + poster_path
-        else:
+        if response.status_code != 200:
             return "https://via.placeholder.com/500x750?text=No+Poster"
 
-    except requests.exceptions.RequestException as e:
-        # NEVER crash Streamlit
-        print(f"TMDB error for movie_id {movie_id}: {e}")
-        return "https://via.placeholder.com/500x750?text=API+Error"
+        data = response.json()
+        poster_path = data.get("poster_path")
+
+        if poster_path:
+            return "https://image.tmdb.org/t/p/w500" + poster_path
+
+        return "https://via.placeholder.com/500x750?text=No+Poster"
+
+    except Exception:
+        # silently ignore TMDB issues
+        return "https://via.placeholder.com/500x750?text=No+Poster"
 
 def recommend(movie):
     movie_index = movies[movies['title'] == movie].index[0]
