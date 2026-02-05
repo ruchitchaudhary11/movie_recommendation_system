@@ -3,7 +3,8 @@ import pickle
 import pandas as pd
 import requests
 
-API_KEY = "bdb1b6f6f524ecda7caf5034e7f9f665"
+API_KEY = st.secrets["TMDB_API_KEY"]
+
 
 @st.cache_data(show_spinner=False)
 def fetch_poster(movie_id):
