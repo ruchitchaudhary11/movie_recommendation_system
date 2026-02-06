@@ -1,7 +1,21 @@
-import streamlit as st
-import pickle
 import pandas as pd
 import requests
+import os
+import pickle
+import gdown
+import streamlit as st
+
+SIMILARITY_FILE = "similarity.pkl"
+GDRIVE_FILE_ID = "1ve_rPjJtqep2QdvpU8ozPr66y6HkmDwz"
+
+# download similarity matrix if it doesn't exist
+if not os.path.exists(SIMILARITY_FILE):
+    with st.spinner("📥 Downloading similarity matrix..."):
+        url = f"https://drive.google.com/uc?id={GDRIVE_FILE_ID}"
+        gdown.download(url, SIMILARITY_FILE, quiet=False)
+
+# load it
+similarity = pickle.load(open(SIMILARITY_FILE, "rb"))
 
 def fetch_poster(movie_id):
     try:
